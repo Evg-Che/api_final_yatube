@@ -9,6 +9,14 @@ class Group(models.Model):
     slug = models.SlugField()
     description = models.TextField()
 
+    class Meta:
+        ordering = ('-title',)
+        verbose_name = 'Группа статей'
+        verbose_name_plural = 'Группы статей'
+
+    def __str__(self) -> str:
+        return self.title[:10]
+
 
 class Post(models.Model):
     text = models.TextField()
@@ -26,8 +34,13 @@ class Post(models.Model):
         verbose_name="Группа",
     )
 
+    class Meta:
+        ordering = ('pub_date',)
+        verbose_name = 'Статья',
+        verbose_name_plural = 'Статьи'
+
     def __str__(self):
-        return self.text
+        return self.text[:10]
 
 
 class Comment(models.Model):
@@ -38,6 +51,14 @@ class Comment(models.Model):
     text = models.TextField()
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
+    
+    class Meta:
+        ordering = ('-created',)
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self) -> str:
+        return f'{self.author} left the comment {self.text}'[:15]
 
 
 class Follow(models.Model):
@@ -53,9 +74,15 @@ class Follow(models.Model):
     )
 
     class Meta:
-        constraints = [
+        ordering = ('-user',)
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = (
             models.UniqueConstraint(
-                fields=['user', 'following'],
-                name='unique_following'
-            )
-        ]
+                name='unique_follow',
+                fields=('user', 'following')
+            ),
+        )
+
+    def __str__(self) -> str:
+        return f'{self.user} follows {self.following}'
